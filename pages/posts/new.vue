@@ -1,6 +1,6 @@
 <template>
-	<v-layout column justify-center align-center>
-		<v-flex xs12 sm8 md6>
+	<v-layout column justify-center>
+		<v-flex xs12 sm12 md8 lg8>
 			<div class="text-xs-center">
 				<p>Add a new post</p>
 			</div>
@@ -31,21 +31,45 @@
 						prepend-icon="insert_comment"
 						multi-line
 				></v-text-field>
-				<v-btn
-						color="secondary"
-						@click="clear"
+				<v-tooltip bottom
+				           open-delay="450"
 				>
-					Clear
-				</v-btn>
-				<v-btn
-						ref="submitButton"
-						color="secondary"
-						:loading="loading"
-						:disabled="loading || !valid"
-						@click="submit"
+					<v-btn flat
+					       icon
+					       nuxt
+					       to="/"
+					       slot="activator"
+					>
+						<v-icon>cancel</v-icon>
+					</v-btn>
+					<span>Cancel the post creation</span>
+				</v-tooltip>
+				<v-tooltip bottom
+				           open-delay="450"
 				>
-					Add post
-				</v-btn>
+					<v-btn flat
+					       @click.native="clearForm"
+					       slot="activator"
+					>
+						<!--<v-icon>clear</v-icon>-->
+						<span>Clear</span>
+					</v-btn>
+					<span>Clear the form</span>
+				</v-tooltip>
+				<v-tooltip bottom
+				           open-delay="450"
+				>
+					<v-btn ref="submitButton"
+					       @click.native="submit"
+					       :loading="loading"
+					       :disabled="loading || !valid"
+					       slot="activator"
+					>
+						<v-icon>add</v-icon>
+						<span>Add post</span>
+					</v-btn>
+					<span>Add post</span>
+				</v-tooltip>
 			</v-form>
 		</v-flex>
 	</v-layout>
@@ -72,7 +96,7 @@
                 content         : '',
                 titleRules      : [
                     v => !!v || 'A title is required',
-                    v => v.length >= 3 || 'Title must be at least 3 characters long',
+                    v => (v !== null && v.length >= 3) || 'Title must be at least 3 characters long',
                 ],
                 contentRules    : [
                     v => !!v || 'An empty content is not allowed',
@@ -90,7 +114,11 @@
         computed: {
             slug: {
                 get() {
-                    return this.slugify(this.title);
+                    if (this.title !== null) {
+                        return this.slugify(this.title);
+                    }
+
+                    return '';
                 },
                 set(newValue) {
                     if (!this.modifyingTheSlug && this.slug !== newValue) {
@@ -157,7 +185,7 @@
                 });
             },
 
-            clear() {
+            clearForm() {
                 this.$refs.form.reset();
             },
 
