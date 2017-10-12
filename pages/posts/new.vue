@@ -1,0 +1,181 @@
+<template>
+	<v-layout column justify-center align-center>
+		<v-flex xs12 sm8 md6>
+			<div class="text-xs-center">
+				<p>Add a new post</p>
+			</div>
+			<v-form v-model="valid" ref="form">
+				<v-text-field
+						label="Title"
+						v-model="title"
+						:rules="titleRules"
+						:counter="3"
+						required
+						prepend-icon="event_note"
+				></v-text-field>
+				<v-text-field
+						label="Slug"
+						v-model="slug"
+						:rules="slugRules"
+						required
+						prepend-icon="event_note"
+				></v-text-field>
+				<v-checkbox :label="`Favorite post? ${favorite?'yes':'no'}`"
+				            v-model="favorite"
+				></v-checkbox>
+				<v-text-field
+						label="Content"
+						v-model="content"
+						:rules="contentRules"
+						required
+						prepend-icon="insert_comment"
+						multi-line
+				></v-text-field>
+				<v-btn
+						color="secondary"
+						@click="clear"
+				>
+					Clear
+				</v-btn>
+				<v-btn
+						ref="submitButton"
+						color="secondary"
+						:loading="loading"
+						:disabled="loading || !valid"
+						@click="submit"
+				>
+					Add post
+				</v-btn>
+			</v-form>
+		</v-flex>
+	</v-layout>
+</template>
+
+<script>
+    import axios from '../../node_modules/axios/dist/axios.min';
+
+    export default {
+        name: 'AddPostPage',
+
+        components: {
+            //
+        },
+
+        props: [
+            //
+        ],
+
+        data() {
+            return {
+                valid           : false,
+                title           : '',
+                content         : '',
+                titleRules      : [
+                    v => !!v || 'A title is required',
+                    v => v.length >= 3 || 'Title must be at least 3 characters long',
+                ],
+                contentRules    : [
+                    v => !!v || 'An empty content is not allowed',
+//                    v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid',
+                ],
+                slugRules       : [ //FIXME à terminer
+//	                v => this.checkCharInStr(v, [' ', '?', '+', '&']),
+                ],
+                loading         : false,
+                modifyingTheSlug: false, // Keep track if the user is currently modifying the slug
+                favorite        : false, // Is this post a favorite?
+            };
+        },
+
+        computed: {
+            slug: {
+                get() {
+                    return this.slugify(this.title);
+                },
+                set(newValue) {
+                    if (!this.modifyingTheSlug && this.slug !== newValue) {
+                        this.modifyingTheSlug = true; // This prevent calling the computed setter in an infinite loop
+                        this.slug = newValue;
+                        this.modifyingTheSlug = false;
+                    }
+                },
+            },
+        },
+
+        methods: {
+            checkCharInStr(string, substringsArray) { //FIXME à tester
+                return substringsArray.some(v => string.indexOf(v) >= 0);
+            },
+
+            submit() { //FIXME à terminer
+                console.log(`Submitting the new post...`); //DEBUG
+                console.log('this.$refs.submitButton:', this.$refs.submitButton); //DEBUG
+                console.log('this.$refs.submitButton.$el:', this.$refs.submitButton.$el); //DEBUG
+//                this.$refs.submitButton.$el.submit();
+
+                if (this.$refs.form.validate()) {
+                    console.log(`Form is valid`); //DEBUG
+                    // Native form submission is not yet supported
+                    this.postPost();
+                }
+            },
+
+            postPost() {
+                console.log(`Posting the post...`); //DEBUG
+                const postData = {
+                    title: this.title,
+                    slug: this.slug,
+                    content: this.content,
+                    favorite: this.favorite,
+                    timesViewed: 1, // By default we consider creating the post count as its first view
+                    timesEdited: 0,
+                };
+
+                 //FIXME uncomment -->
+                // Method 1
+                /*
+                axios.post('http://devsnaps:4242/posts', postData)
+                    .then(response => {
+                        console.log(`Posting was successful.`);
+                    }, error => {
+                        throw new Error(`Error while trying to post the new post (sic!).`, error);
+                    });
+                    */
+
+                // Method 2
+                axios({
+                    method: 'post',
+                    url   : 'http://devsnaps:4242/posts',
+                    data  : postData,
+                }).then(response => {
+                    console.log(`Posting was successful.`);
+
+                    // Then redirect to the posts page
+                    this.$router.replace({ path: '/' });
+                }, error => {
+                    throw new Error(`Error while trying to post the new post (sic!).`, error);
+                });
+            },
+
+            clear() {
+                this.$refs.form.reset();
+            },
+
+            slugify(text) {
+                return text.toString().toLowerCase()
+                    .replace(/\s+/g, '-')    // Replace spaces with '-'
+                    .replace(/&/g, '-and-')  // Replace & with 'and'
+                    .replace(/[^\w-]+/g, '') // Remove all non-word characters
+                    .replace(/--+/g, '-');   // Replace multiple '-' with a single '-'
+            },
+        },
+
+        mounted() {
+            //
+        },
+    };
+</script>
+
+<style lang="scss" rel="stylesheet/scss" scoped>
+
+</style>

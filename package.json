@@ -1,0 +1,41 @@
+{
+  "name": "devsnaps",
+  "version": "1.0.0",
+  "description": "Everyday solutions to everyday dev problems",
+  "author": "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env HOST=devsnaps PORT=3000 nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "back": "php -S devsnaps:4242 -t ../back-end/public"
+  },
+  "dependencies": {
+    "axios": "^0.16.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.1",
+    "nuxt": "^1.0.0-rc11",
+    "prismjs": "^1.8.1",
+    "vue-markdown": "^2.2.4",
+    "vuetify": "^0.16.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "cross-env": "^5.0.5",
+    "css-loader": "^0.28.7",
+    "eslint": "^4.3.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-html": "^3.1.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "vue-style-loader": "^3.0.3"
+  }
+}
