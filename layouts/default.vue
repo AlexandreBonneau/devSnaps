@@ -17,7 +17,11 @@
 				</v-list-tile>
 				<v-list-tile avatar tag="div">
 					<v-list-tile-avatar>
-						<img src="/v.png" />
+						<nuxt-link to="/">
+							<svg class="logo">
+								<use xlink:href="svg-defs.svg#logo-devSnaps"></use>
+							</svg>
+						</nuxt-link>
 					</v-list-tile-avatar>
 					<v-list-tile-content>
 						<v-list-tile-title>Dev Snaps</v-list-tile-title>
@@ -91,6 +95,11 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss" scoped>
+	.logo {
+		color : #76F8FF;
+		width : 40px;
+	}
+
 	.homeLink {
 		text-decoration: none;
 	}
