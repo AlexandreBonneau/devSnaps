@@ -2,7 +2,7 @@
 	<v-layout column justify-center>
 		<v-flex xs12 sm12 md8 lg8>
 			<div class="text-xs-center">
-				<p>Add a new post</p>
+				<p>Add a new snap</p>
 			</div>
 			<v-form v-model="valid" ref="form">
 				<v-text-field
@@ -20,7 +20,7 @@
 						required
 						prepend-icon="event_note"
 				></v-text-field>
-				<v-checkbox :label="`Favorite post? ${favorite?'yes':'no'}`"
+				<v-checkbox :label="`Favorite snap? ${favorite?'yes':'no'}`"
 				            v-model="favorite"
 				></v-checkbox>
 				<v-text-field
@@ -42,7 +42,7 @@
 					>
 						<v-icon>cancel</v-icon>
 					</v-btn>
-					<span>Cancel the post creation</span>
+					<span>Cancel the snap creation</span>
 				</v-tooltip>
 				<v-tooltip bottom
 				           open-delay="450"
@@ -66,9 +66,9 @@
 					       slot="activator"
 					>
 						<v-icon>add</v-icon>
-						<span>Add post</span>
+						<span>Add snap</span>
 					</v-btn>
-					<span>Add post</span>
+					<span>Add snap</span>
 				</v-tooltip>
 			</v-form>
 		</v-flex>
@@ -76,10 +76,10 @@
 </template>
 
 <script>
-    import axios from '../../node_modules/axios/dist/axios.min';
+    import axios from '../node_modules/axios/dist/axios.min';
 
     export default {
-        name: 'AddPostPage',
+        name: 'AddSnapPage',
 
         components: {
             //
@@ -107,7 +107,7 @@
                 ],
                 loading         : false,
                 modifyingTheSlug: false, // Keep track if the user is currently modifying the slug
-                favorite        : false, // Is this post a favorite?
+                favorite        : false, // Is this snap a favorite?
             };
         },
 
@@ -135,38 +135,38 @@
                 return substringsArray.some(v => string.indexOf(v) >= 0);
             },
 
-            submit() { //FIXME à terminer
-                console.log(`Submitting the new post...`); //DEBUG
-                console.log('this.$refs.submitButton:', this.$refs.submitButton); //DEBUG
-                console.log('this.$refs.submitButton.$el:', this.$refs.submitButton.$el); //DEBUG
+            submit() {
+                console.log(`Submitting the new snap...`); //DEBUG
+//                console.log('this.$refs.submitButton:', this.$refs.submitButton); //DEBUG
+//                console.log('this.$refs.submitButton.$el:', this.$refs.submitButton.$el); //DEBUG
 //                this.$refs.submitButton.$el.submit();
 
                 if (this.$refs.form.validate()) {
-                    console.log(`Form is valid`); //DEBUG
+//                    console.log(`Form is valid`); //DEBUG
                     // Native form submission is not yet supported
-                    this.postPost();
+                    this.postSnap();
                 }
             },
 
-            postPost() {
-                console.log(`Posting the post...`); //DEBUG
-                const postData = {
-                    title: this.title,
-                    slug: this.slug,
-                    content: this.content,
-                    favorite: this.favorite,
-                    timesViewed: 1, // By default we consider creating the post count as its first view
+            postSnap() {
+                console.log(`Posting the snap...`); //DEBUG
+                const snapData = {
+                    title      : this.title,
+                    slug       : this.slug,
+                    content    : this.content,
+                    favorite   : this.favorite,
+                    timesViewed: 1, // By default we consider creating the snap count as its first view
                     timesEdited: 0,
                 };
 
                  //FIXME uncomment -->
                 // Method 1
                 /*
-                axios.post('http://devsnaps:4242/posts', postData)
+                axios.post('http://devsnaps:4242/posts', snapData)
                     .then(response => {
                         console.log(`Posting was successful.`);
                     }, error => {
-                        throw new Error(`Error while trying to post the new post (sic!).`, error);
+                        throw new Error(`Error while trying to post the new snap (sic!).`, error);
                     });
                     */
 
@@ -174,14 +174,15 @@
                 axios({
                     method: 'post',
                     url   : 'http://devsnaps:4242/posts',
-                    data  : postData,
+                    data  : snapData,
                 }).then(response => {
                     console.log(`Posting was successful.`);
 
-                    // Then redirect to the posts page
-                    this.$router.replace({ path: '/' });
+                    // Then redirect to the all snaps page
+                    //TODO Redirect to the /user/snaps page instead?
+                    this.$router.replace({ path: '/snaps' });
                 }, error => {
-                    throw new Error(`Error while trying to post the new post (sic!).`, error);
+                    throw new Error(`Error while trying to post the new snap.`, error);
                 });
             },
 
@@ -196,10 +197,6 @@
                     .replace(/[^\w-]+/g, '') // Remove all non-word characters
                     .replace(/--+/g, '-');   // Replace multiple '-' with a single '-'
             },
-        },
-
-        mounted() {
-            //
         },
     };
 </script>

@@ -55,6 +55,8 @@
 			<nuxt-link to="/" class="homeLink">
 				<v-toolbar-title v-text="title"></v-toolbar-title>
 			</nuxt-link>
+			<!--//FIXME Add permanent link to the 'create new snap', 'the user profile' or the 'login + sign up' buttons-->
+			<!--//FIXME Also add a permanent search box-->
 		</v-toolbar>
 		<main>
 			<v-content>
@@ -77,19 +79,34 @@
                 drawer     : false, // Hide the drawer by default
                 fixed      : false,
                 items      : [
-                    { icon: 'home', title: 'Posts', to: '/' },
-                    { icon: 'search', title: 'Search the posts', to: '/search' },
+                    { icon: 'home', title: 'Home', to: '/' },
+                    { icon: 'view_quilt', title: 'All Snaps', to: '/snaps' },
+//                    { icon: 'search', title: 'Search the posts', to: '/search' },
                     { icon: 'star', title: 'Selected posts', to: '/favorites' },
                     { icon: 'whatshot', title: 'Hot posts', to: '/hot' },
-                    { icon: 'add_box', title: 'Add a new post', to: '/posts/new' },
-                    { icon: 'settings', title: 'Manage your settings', to: '/settings' },
-                    { icon: 'insert_chart', title: 'Statistics', to: '/stats' },
+                    { icon: 'assignment', title: 'My Snaps', to: `/${this.$store.state.currentUser}/snaps` },
+
+                    { icon: 'add_box', title: 'Create a new Snap', to: '/snap' },
+                    { icon: 'book', title: 'Documentation', to: '/hi' },
+                    { icon: 'input', title: 'Login', to: '/login' },
+                    { icon: 'account_box', title: 'Sign up', to: '/signup' }, //FIXME Only display if a user is not logged in
+//                    { icon: 'insert_chart', title: 'Statistics', to: '/stats' },
+                    { icon: 'settings', title: 'Settings', to: `/profile/${this.$store.state.currentUser}` },
+//                    { icon: 'file_download', title: 'Export all your snaps', to: `/${this.$store.state.currentUser}/export` }, //FIXME Only display if a user is logged in //FIXME Dislay that only in the settings page
+                    { icon: 'power_settings_new', title: 'Logout', to: '/logout' }, //FIXME Only display if a user is logged in
+                    { icon: 'delete_forever', title: 'Testing a single snap', to: '/acid/snap/5/the-slug-to-use' }, //FIXME Delete this (only used for tests)
                 ],
                 miniVariant: false,
                 right      : true,
                 rightDrawer: false,
                 title      : 'Dev Snaps',
             };
+        },
+
+        methods: {
+            isLogged() { //FIXME Test this
+                return this.$store.state.currentUser !== null;
+            },
         },
     };
 </script>
