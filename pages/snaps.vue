@@ -167,7 +167,8 @@
     import axios from '../node_modules/axios/dist/axios.min';
     import VueMarkdown from '../node_modules/vue-markdown/src/VueMarkdown';
     import Prism from '../node_modules/prismjs/prism';
-    import moment from '../node_modules/moment/moment'; //FIXME Finish this
+    import moment from '../node_modules/moment/moment';
+    import config from '../config/base';
 
     /**
      * Define the Exception object
@@ -196,9 +197,6 @@
 
         data() {
             return {
-                api                 : {
-                    baseUrl: 'http://devsnaps:4242',
-                },
                 removeDialog        : false, // The modal is not displayed by default
                 pendingIdToRemove   : null, // Keep track of the snap id to remove if the user confirms the action
                 pendingTitleToRemove: null, // Keep track of the snap title to remove if the user confirms the action
@@ -282,7 +280,7 @@
             },
 
             async getSnaps() {
-                return await axios.get(`${this.api.baseUrl}/posts`)
+                return await axios.get(`${config.api.baseUrl}/posts`)
                     .then(response => {
                         this.snaps = response.data;
 //                        console.log(`Snaps fetched!`); //DEBUG
@@ -365,7 +363,7 @@
              */
             remove(id) {
                 // Remove the snap from the server
-                axios.delete(`${this.api.baseUrl}/posts/${id}`)
+                axios.delete(`${config.api.baseUrl}/posts/${id}`)
                     .then(response => {
                         console.log(`Snap ${id} deleted!`); //DEBUG
 
@@ -395,7 +393,7 @@
              */
             _updatePost(snapData) {
                 // Send the updated data
-                axios.put(`${this.api.baseUrl}/posts`, snapData)
+                axios.put(`${config.api.baseUrl}/posts`, snapData)
                     .then(response => {
                         console.log('response.data:', response.data); //DEBUG
 
