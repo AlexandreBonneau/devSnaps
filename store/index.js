@@ -22,6 +22,7 @@ export default createStore;
 export const state = () => ({
     currentUser : 'alex', //FIXME Get this data from the API
     snaps : [], //TODO Add all the snaps data here
+    showDrawer : false,
 });
 
 export const getters = {
@@ -73,5 +74,10 @@ export const mutations = {
         console.log(`logout() vuex called`); //DEBUG
         //FIXME Ping the server about the disconnection
         state.currentUser = null;
+    },
+
+    toggleDrawer(state) { //FIXME Test this
+        // This is called by `v-navigation-drawer`
+        state.showDrawer = !state.showDrawer;
     },
 };
