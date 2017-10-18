@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env HOST=devsnaps PORT=3000 nuxt",
+    "front": "yarn dev",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
