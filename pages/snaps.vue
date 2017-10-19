@@ -6,7 +6,7 @@
 				<v-select
 						:items="titlesAndContent"
 						v-model="search"
-						label="Search the snaps"
+						label="Search snaps..."
 						autocomplete
 				></v-select>
 			</div>
@@ -144,20 +144,20 @@
 			</v-card>
 		</v-dialog>
 		<v-snackbar
-				:timeout="snackbarTimeout"
-				:top="snackbarY === 'top'"
-				:bottom="snackbarY === 'bottom'"
-				:right="snackbarX === 'right'"
-				:left="snackbarX === 'left'"
-				:multi-line="snackbarMode === 'multi-line'"
-				:vertical="snackbarMode === 'vertical'"
-				:color="snackbarColor"
+				:timeout="$store.state.snackbarTimeout"
+				:top="$store.state.snackbarY === 'top'"
+				:bottom="$store.state.snackbarY === 'bottom'"
+				:right="$store.state.snackbarX === 'right'"
+				:left="$store.state.snackbarX === 'left'"
+				:multi-line="$store.state.snackbarMode === 'multi-line'"
+				:vertical="$store.state.snackbarMode === 'vertical'"
+				:color="$store.state.snackbarColor"
 				v-model="snackbar"
 		>
-			{{ snackbarText }}
+			{{ $store.state.snackbarText }}
 			<v-btn flat
 			       color="white"
-			       @click.native="snackbar = false"
+			       @click.native="_hideSnackbar"
 			>Close</v-btn>
 		</v-snackbar>
 	</v-layout>
@@ -204,14 +204,6 @@
                 initialFetchFailed  : false,
                 titlesAndContent    : [''], // By default, the search terms are empty
                 search              : null, // The search term is empty by default
-                // Snackbar
-                snackbar       : false,
-                snackbarY      : 'top',
-                snackbarX      : 'right',
-                snackbarMode   : '',
-                snackbarTimeout: 6000,
-                snackbarText   : '',
-                snackbarColor  : '',
             };
         },
 
@@ -223,6 +215,15 @@
              */
             snapCount() {
                 return Object.keys(this.snaps).length;
+            },
+
+            snackbar: {
+                get() {
+                    return this.$store.state.snackbar;
+                },
+                set(value) {
+                    this.$store.commit('setSnackbar', value);
+                },
             },
         },
 
@@ -309,23 +310,16 @@
              * Show a snackbar with the given text
              */
             _showSnackbar(text, type = 'info') {
-                switch (type) {
-                    case 'warning':
-                        this.snackbarColor = 'warning';
-                        break;
-                    case 'error':
-                        this.snackbarColor = 'error';
-                        break;
-                    case 'success':
-                        this.snackbarColor = 'success';
-                        break;
-                    case 'info':
-                    default:
-                        this.snackbarColor = 'info';
-                }
+                this.$store.commit('modifySnackbarColor', type);
+                this.$store.commit('modifySnackbarText', text);
+                this.$store.commit('showSnackbar');
+            },
 
-                this.snackbarText = text;
-                this.snackbar = true;
+            /**
+             * Hide the snackbar
+             */
+            _hideSnackbar() {
+                this.$store.commit('hideSnackbar');
             },
 
             /**

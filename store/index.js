@@ -23,6 +23,15 @@ export const state = () => ({
     currentUser : 'alex', //FIXME Get this data from the API
     snaps : [], //TODO Add all the snaps data here
     showDrawer : false,
+
+    // Default values for the Snackbar state
+    snackbar       : false,
+    snackbarY      : 'top',
+    snackbarX      : 'right',
+    snackbarMode   : '',
+    snackbarTimeout: 6000,
+    snackbarText   : '',
+    snackbarColor  : '',
 });
 
 export const getters = {
@@ -57,6 +66,7 @@ export const getters = {
 };
 
 export const mutations = {
+    // ---------------- Auth management
     /**
      * What happens when a user just logged in
      * @param state
@@ -76,8 +86,43 @@ export const mutations = {
         state.currentUser = null;
     },
 
-    toggleDrawer(state) { //FIXME Test this
+    // ---------------- Navigation drawer management
+    toggleDrawer(state) {
         // This is called by `v-navigation-drawer`
         state.showDrawer = !state.showDrawer;
+    },
+
+    // ---------------- Snackbar management
+    modifySnackbarColor(state, colorType) {
+        switch (colorType) {
+            case 'warning':
+                state.snackbarColor = 'warning';
+                break;
+            case 'error':
+                state.snackbarColor = 'error';
+                break;
+            case 'success':
+                state.snackbarColor = 'success';
+                break;
+            case 'info':
+            default:
+                state.snackbarColor = 'info';
+        }
+    },
+
+    modifySnackbarText(state, text) {
+        state.snackbarText = text;
+    },
+
+    showSnackbar(state) {
+        state.snackbar = true;
+    },
+
+    hideSnackbar(state) {
+        state.snackbar = false;
+    },
+
+    setSnackbar(state, value) {
+        state.snackbar = value;
     },
 };
