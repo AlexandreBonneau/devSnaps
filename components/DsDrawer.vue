@@ -3,12 +3,12 @@
 			temporary
 			:mini-variant="miniVariant"
 			:clipped="clipped"
-			:value="$store.state.showDrawer"
+			:value="$store.state.navigationDrawer.showDrawer"
 			@input="toggleDrawer"
 			app
 	>
 			<!--@input="toggleDrawer"-->
-			<!--v-model="$store.state.showDrawer"-->
+			<!--v-model="$store.state.navigationDrawer.showDrawer"-->
 		<v-list>
 			<v-list-tile v-if="miniVariant"
 			             @click.stop="miniVariant = !miniVariant"
@@ -67,15 +67,15 @@
 //                    { icon: 'search', title: 'Search the posts', to: '/search' },
                     { icon: 'star', title: 'Selected posts', to: '/favorites' },
                     { icon: 'whatshot', title: 'Hot posts', to: '/hot' },
-                    { icon: 'assignment', title: 'My Snaps', to: `/${this.$store.state.currentUser}/snaps` },
+                    { icon: 'assignment', title: 'My Snaps', to: `/${this.$store.state.auth.currentUser}/snaps` },
 
                     { icon: 'add_box', title: 'Create a new Snap', to: '/snap' },
                     { icon: 'book', title: 'Documentation', to: '/hi' },
                     { icon: 'input', title: 'Login', to: '/login' },
                     { icon: 'account_box', title: 'Sign up', to: '/signup' }, //FIXME Only display if a user is not logged in
 //                    { icon: 'insert_chart', title: 'Statistics', to: '/stats' },
-                    { icon: 'settings', title: 'Settings', to: `/profile/${this.$store.state.currentUser}` },
-//                    { icon: 'file_download', title: 'Export all your snaps', to: `/${this.$store.state.currentUser}/export` }, //FIXME Only display if a user is logged in //FIXME Display that only in the settings page
+                    { icon: 'settings', title: 'Settings', to: `/profile/${this.$store.state.auth.currentUser}` },
+//                    { icon: 'file_download', title: 'Export all your snaps', to: `/${this.$store.state.auth.currentUser}/export` }, //FIXME Only display if a user is logged in //FIXME Display that only in the settings page
                     { icon: 'power_settings_new', title: 'Logout', to: '/logout' }, //FIXME Only display if a user is logged in
                     { icon: 'delete_forever', title: 'Testing a single snap', to: '/acid/snap/5/the-slug-to-use' }, //FIXME Delete this (only used for tests)
                 ],
@@ -89,7 +89,7 @@
                     // Only toggle back the drawer if this tries to hide it
                     // The 'hide' action is done when user clicks on the scrim
                     // If I were to commit 'toggleDrawer' in all cases, I end up having an infinite loop
-                    this.$store.commit('toggleDrawer');
+                    this.$store.commit('navigationDrawer/toggleDrawer');
                 }
             },
         },

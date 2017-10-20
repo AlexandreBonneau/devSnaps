@@ -25,7 +25,7 @@
 
         methods: {
             toggleDrawer() {
-                this.$store.commit('toggleDrawer');
+                this.$store.commit('navigationDrawer/toggleDrawer');
             },
         },
     };

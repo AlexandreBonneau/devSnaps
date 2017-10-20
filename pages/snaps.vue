@@ -4,13 +4,13 @@
 			<div class="text-xs-center">
 				<p>Search the <strong>{{ snapCount }}</strong> snaps</p>
 				<v-select
-						:items="$store.state.titlesAndContent"
+						:items="$store.state.snaps.titlesAndContent"
 						v-model="search"
 						label="Search snaps..."
 						autocomplete
 				></v-select>
 			</div>
-			<snap v-for="snap in $store.state.snaps"
+			<snap v-for="snap in $store.state.snaps.snaps"
 			      :key="snap.id"
 			      :id="snap.id"
 			      :title="snap.title"
@@ -40,12 +40,12 @@
 			<v-btn @click.native="_getSnaps">Try to fetch the data from the server again</v-btn>
 			<!--//FIXME Add a button to try to fetch the data again, without having to reload the page-->
 		</v-flex>
-		<v-dialog v-model="$store.state.removeDialog" lazy absolute>
+		<v-dialog v-model="$store.state.removeDialog.removeDialog" lazy absolute>
 			<v-card>
 				<v-card-title>
 					<div class="headline">Are you sure you want to delete that snap?</div>
 				</v-card-title>
-				<v-card-text>Deleting the snap [<i>{{ $store.state.pendingTitleToRemove }}</i>] <strong>cannot be undone</strong>.<br><br>Use with care.</v-card-text>
+				<v-card-text>Deleting the snap [<i>{{ $store.state.removeDialog.pendingTitleToRemove }}</i>] <strong>cannot be undone</strong>.<br><br>Use with care.</v-card-text>
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn color="blue darken-1" flat @click.native="cancelRemove">Cancel</v-btn>
@@ -54,17 +54,17 @@
 			</v-card>
 		</v-dialog>
 		<v-snackbar
-				:timeout="$store.state.snackbarTimeout"
-				:top="$store.state.snackbarY === 'top'"
-				:bottom="$store.state.snackbarY === 'bottom'"
-				:right="$store.state.snackbarX === 'right'"
-				:left="$store.state.snackbarX === 'left'"
-				:multi-line="$store.state.snackbarMode === 'multi-line'"
-				:vertical="$store.state.snackbarMode === 'vertical'"
-				:color="$store.state.snackbarColor"
+				:timeout="$store.state.snackbar.snackbarTimeout"
+				:top="$store.state.snackbar.snackbarY === 'top'"
+				:bottom="$store.state.snackbar.snackbarY === 'bottom'"
+				:right="$store.state.snackbar.snackbarX === 'right'"
+				:left="$store.state.snackbar.snackbarX === 'left'"
+				:multi-line="$store.state.snackbar.snackbarMode === 'multi-line'"
+				:vertical="$store.state.snackbar.snackbarMode === 'vertical'"
+				:color="$store.state.snackbar.snackbarColor"
 				v-model="snackbar"
 		>
-			{{ $store.state.snackbarText }}
+			{{ $store.state.snackbar.snackbarText }}
 			<v-btn flat
 			       color="white"
 			       @click.native="_hideSnackbar"
@@ -74,12 +74,6 @@
 </template>
 
 <script>
-    import axios from '../node_modules/axios/dist/axios.min';
-    import VueMarkdown from '../node_modules/vue-markdown/src/VueMarkdown';
-    import Prism from '../node_modules/prismjs/prism';
-    import moment from '../node_modules/moment/moment';
-    import config from '../config/base';
-    import clone from '../node_modules/lodash/cloneDeep';
     import Snap from '../components/Snap.vue';
 
     /**
@@ -101,7 +95,6 @@
 
         components: {
             Snap,
-            VueMarkdown,
         },
 
         props: [
@@ -122,10 +115,10 @@
 
             snackbar: {
                 get() {
-                    return this.$store.state.snackbar;
+                    return this.$store.state.snackbar.snackbar;
                 },
                 set(value) {
-                    this.$store.commit('setSnackbar', value);
+                    this.$store.commit('snackbar/setSnackbar', value);
                 },
             },
         },
@@ -135,33 +128,33 @@
              * Hide the snackbar
              */
             _hideSnackbar() {
-                this.$store.commit('hideSnackbar');
+                this.$store.commit('snackbar/hideSnackbar');
             },
 
             /**
              * The user confirmed the removal of the snap
              */
             acceptRemove() {
-                this.$store.commit('hideRemoveDialog');
-                this._removeSnap(this.$store.state.pendingIdToRemove);
+                this.$store.commit('removeDialog/hideRemoveDialog');
+                this._removeSnap(this.$store.state.removeDialog.pendingIdToRemove);
                 //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
-                window.setTimeout(() => this.$store.commit('setRemoveDialogInfo', { id: null, title: null }), 300);
+                window.setTimeout(() => this.$store.commit('removeDialog/setRemoveDialogInfo', { id: null, title: null }), 300);
             },
 
             /**
              * The user cancelled the removal of the snap
              */
             cancelRemove() {
-                this.$store.commit('hideRemoveDialog');
+                this.$store.commit('removeDialog/hideRemoveDialog');
                 //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
-                window.setTimeout(() => this.$store.commit('setRemoveDialogInfo', { id: null, title: null }), 300);
+                window.setTimeout(() => this.$store.commit('removeDialog/setRemoveDialogInfo', { id: null, title: null }), 300);
             },
 
             /**
              * Fetch all the snaps
              */
             _getSnaps() {
-                this.$store.dispatch('getSnaps');
+                this.$store.dispatch('snaps/getSnaps');
             },
 
             /**
@@ -170,7 +163,7 @@
              * @param {number} id
              */
             _removeSnap(id) {
-                this.$store.dispatch('removeSnap', id);
+                this.$store.dispatch('snaps/removeSnap', id);
             },
         },
 

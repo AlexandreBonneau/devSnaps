@@ -34,7 +34,7 @@
 
         methods: {
             isLogged() { //FIXME Test this
-                return this.$store.state.currentUser !== null;
+                return this.$store.state.auth.currentUser !== null;
             },
         },
     };

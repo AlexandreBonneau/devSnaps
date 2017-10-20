@@ -175,8 +175,8 @@
              * Show the modal window for the remove confirmation
              */
             displayRemoveModal(id, title) {
-                this.$store.commit('setRemoveDialogInfo', { id, title });
-                this.$store.commit('showRemoveDialog');
+                this.$store.commit('removeDialog/setRemoveDialogInfo', { id, title });
+                this.$store.commit('removeDialog/showRemoveDialog');
             },
 
             /**
@@ -185,7 +185,7 @@
              * @param {number} id
              */
             _toggleFavorite(id) {
-                this.$store.dispatch('toggleFavorite', id);
+                this.$store.dispatch('snaps/toggleFavorite', id);
             },
 
             /**
@@ -195,14 +195,14 @@
              */
             _updateSnap(id) {
                 // Get the snap data
-                const snapArr = this.$store.state.snaps.filter(snap => snap.id === id)[0];
+                const snapArr = this.$store.state.snaps.snaps.filter(snap => snap.id === id)[0];
                 const modifiableSnap = clone(snapArr); // Cloning is needed since I cannot mutate the snap data outside of Vuex mutation methods
 
                 // Update the edit counter
                 modifiableSnap.timesEdited++;
 
                 // Save the change in the database
-                this.$store.dispatch('updateSnap', modifiableSnap);
+                this.$store.dispatch('snaps/updateSnap', modifiableSnap);
             },
 
             updateSyntaxHighligthing() {
