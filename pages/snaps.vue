@@ -10,108 +10,18 @@
 						autocomplete
 				></v-select>
 			</div>
-			<v-card v-for="snap in $store.state.snaps"
-			        :key="snap.id"
-			        class="mb-4 elevation-6"
-			>
-				<v-card-title class="headline"
-				              ref="title"
-				              contenteditable="true"
-				              @value="snap.title"
-				              @input="snap.title = $event.target.textContent"
-				>
-					<v-btn flat
-					       icon
-					       @click="_toggleFavorite(snap.id)"
-					>
-						<v-icon
-								:color="snap.favorite?'amber darken-1':'grey'"
-						>star</v-icon>
-					</v-btn>
-					<nuxt-link :to="`/${snap.id}/${snap.slug}`"
-					           class="snapLink"
-					>{{ snap.title }}
-					</nuxt-link>
-				</v-card-title>
-				<!--//FIXME Create a link that shows only this snap in a `/18/this-is-its-slug` url-->
-				<v-card-text>
-					<vue-markdown ref="content"
-					              :source="snap.content"
-					              @rendered="updateSyntaxHighligthing"
-					></vue-markdown>
-					<v-container fluid grid-list-sm>
-						<!--//TODO Modify those data so it looks better-->
-						<v-layout row justify-space-between>
-							<v-flex>
-								<small>Times viewed: {{ snap.timesViewed }}</small>
-							</v-flex>
-							<v-flex>
-								<small>Times edited: {{ snap.timesEdited }}</small>
-							</v-flex>
-							<v-flex>
-								<small>{{ createdSince(snap) }}</small>
-							</v-flex>
-							<v-flex>
-								<small>{{ updatedSince(snap) }}</small>
-							</v-flex>
-						</v-layout>
-					</v-container>
-				</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-tooltip bottom
-					           open-delay="450"
-					>
-						<v-btn flat
-						       icon
-						       @click="_updateSnap(snap.id)"
-						       slot="activator"
-						>
-							<v-icon>mode_edit</v-icon>
-						</v-btn>
-						<span>Edit the snap</span>
-					</v-tooltip>
-					<v-tooltip bottom
-					           open-delay="450"
-					>
-						<v-btn flat
-						       icon
-						       @click="displayRemoveModal(snap.id, snap.title)"
-						       slot="activator"
-						       class="removeButton"
-						>
-							<v-icon>delete</v-icon>
-						</v-btn>
-						<span>Delete the snap</span>
-					</v-tooltip>
-					<v-tooltip bottom
-					           open-delay="450"
-					>
-						<v-btn flat
-						       icon
-						       :href="urlShare(snap.id, snap.slug)"
-						       slot="activator"
-						>
-							<v-icon>share</v-icon>
-						</v-btn>
-						<span>Share</span>
-					</v-tooltip>
-					<v-tooltip bottom
-					           open-delay="450"
-					>
-						<v-btn flat
-						       icon
-						       color="primary"
-						       :href="urlSearch(snap.title)"
-						       target="_blank"
-						       slot="activator"
-						>
-							<v-icon>public</v-icon>
-						</v-btn>
-						<span>Query the web with that question</span>
-					</v-tooltip>
-				</v-card-actions>
-			</v-card>
+			<snap v-for="snap in $store.state.snaps"
+			      :key="snap.id"
+			      :id="snap.id"
+			      :title="snap.title"
+			      :favorite="snap.favorite"
+			      :slug="snap.slug"
+			      :content="snap.content"
+			      :timesViewed="snap.timesViewed"
+			      :timesEdited="snap.timesEdited"
+			      :createdAt="snap.created_at"
+			      :updatedAt="snap.updated_at"
+			></snap>
 			<v-btn fab
 			       dark
 			       color="indigo"
@@ -130,12 +40,12 @@
 			<v-btn @click.native="_getSnaps">Try to fetch the data from the server again</v-btn>
 			<!--//FIXME Add a button to try to fetch the data again, without having to reload the page-->
 		</v-flex>
-		<v-dialog v-model="removeDialog" lazy absolute>
+		<v-dialog v-model="$store.state.removeDialog" lazy absolute>
 			<v-card>
 				<v-card-title>
 					<div class="headline">Are you sure you want to delete that snap?</div>
 				</v-card-title>
-				<v-card-text>Deleting the snap [<i>{{ pendingTitleToRemove }}</i>] <strong>cannot be undone</strong>.<br><br>Use with care.</v-card-text>
+				<v-card-text>Deleting the snap [<i>{{ $store.state.pendingTitleToRemove }}</i>] <strong>cannot be undone</strong>.<br><br>Use with care.</v-card-text>
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn color="blue darken-1" flat @click.native="cancelRemove">Cancel</v-btn>
@@ -170,6 +80,7 @@
     import moment from '../node_modules/moment/moment';
     import config from '../config/base';
     import clone from '../node_modules/lodash/cloneDeep';
+    import Snap from '../components/Snap.vue';
 
     /**
      * Define the Exception object
@@ -189,6 +100,7 @@
         name: 'SnapList',
 
         components: {
+            Snap,
             VueMarkdown,
         },
 
@@ -198,9 +110,6 @@
 
         data() {
             return {
-                removeDialog        : false, // The modal is not displayed by default
-                pendingIdToRemove   : null, // Keep track of the snap id to remove if the user confirms the action
-                pendingTitleToRemove: null, // Keep track of the snap title to remove if the user confirms the action
                 initialFetchFailed  : false,
                 search              : null, // The search term is empty by default
             };
@@ -223,47 +132,6 @@
 
         methods: {
             /**
-             * Return a English string stating since how many time the snap has been created
-             * //TODO i18n this
-             *
-             * @param {object} snap
-             */
-            createdSince(snap) {
-                return `Created ${moment.utc(snap.created_at+'').fromNow()}`;
-            },
-
-            /**
-             * Return a English string stating since how many time the snap has been last updated
-             * //TODO i18n this
-             *
-             * @param {object} snap
-             */
-            updatedSince(snap) {
-                return `Updated ${moment.utc(snap.updated_at).fromNow()}`;
-            },
-
-            /**
-             * Return the URL for the given snap id and slug
-             *
-             * @param {number} snapId
-             * @param {string} snapSlug
-             * @returns {string}
-             */
-            urlShare(snapId, snapSlug) {
-                return `/${snapId}/${snapSlug}`;
-            },
-
-            /**
-             * Return the search engine URL with the given query
-             *
-             * @param {string} query
-             * @returns {string}
-             */
-            urlSearch(query) {
-                return `https://duckduckgo.com/?q=${query}&t=ffab`;
-            },
-
-            /**
              * Hide the snackbar
              */
             _hideSnackbar() {
@@ -271,32 +139,22 @@
             },
 
             /**
-             * Show the modal window for the remove confirmation
-             */
-            displayRemoveModal(id, title) {
-                // First display a modal with a confirmation for the deletion
-                this.removeDialog = true;
-                this.pendingIdToRemove = id;
-                this.pendingTitleToRemove = title;
-            },
-
-            /**
              * The user confirmed the removal of the snap
              */
             acceptRemove() {
-                this.removeDialog = false;
-                this._removeSnap(this.pendingIdToRemove);
-                this.pendingIdToRemove = null;
-                this.pendingTitleToRemove = null;
+                this.$store.commit('hideRemoveDialog');
+                this._removeSnap(this.$store.state.pendingIdToRemove);
+                //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
+                window.setTimeout(() => this.$store.commit('setRemoveDialogInfo', { id: null, title: null }), 300);
             },
 
             /**
              * The user cancelled the removal of the snap
              */
             cancelRemove() {
-                this.removeDialog = false;
-                this.pendingIdToRemove = null;
-                this.pendingTitleToRemove = null;
+                this.$store.commit('hideRemoveDialog');
+                //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
+                window.setTimeout(() => this.$store.commit('setRemoveDialogInfo', { id: null, title: null }), 300);
             },
 
             /**
@@ -314,37 +172,6 @@
             _removeSnap(id) {
                 this.$store.dispatch('removeSnap', id);
             },
-
-            /**
-             * Toggle the state of the `favorite` data, then transmit that change to the database
-             *
-             * @param {number} id
-             */
-            _toggleFavorite(id) {
-                this.$store.dispatch('toggleFavorite', id);
-            },
-
-            /**
-             * Select the snap with the given id, and update the database with its data
-             *
-             * @param {number} id
-             */
-            _updateSnap(id) {
-                // Get the snap data
-                const snapArr = this.$store.state.snaps.filter(snap => snap.id === id)[0];
-                const modifiableSnap = clone(snapArr); // Cloning is needed since I cannot mutate the snap data outside of Vuex mutation methods
-
-                // Update the edit counter
-                modifiableSnap.timesEdited++;
-
-                // Save the change in the database
-                this.$store.dispatch('updateSnap', modifiableSnap);
-            },
-
-            updateSyntaxHighligthing() {
-//                console.log(`updateSyntaxHighligthing called.`, Prism); //DEBUG
-                Prism.highlightAll(); //TODO Only call that once once all the snaps contents are loaded, and not for every single snaps
-            },
         },
 
         mounted() {
@@ -353,21 +180,10 @@
 //            this.snaps = this.getSnaps();
             this._getSnaps();
         },
-
-        watch: {
-            removeDialog(oldValue, newValue) {
-                if (newValue === true) {
-                    this.pendingIdToRemove = null;
-                    this.pendingTitleToRemove = null;
-                }
-            },
-        },
     };
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-	/*@import '../node_modules/prismjs/themes/prism-okaidia.css';*/
-
 	code {
 		color: #A9B7C6;
 		background-color: #2B2B2B;

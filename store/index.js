@@ -36,6 +36,11 @@ export const state = () => ({
     snackbarText   : '',
     snackbarColor  : '',
 
+    // Default values for the modal dialog state
+    removeDialog        : false, // The modal is not displayed by default
+    pendingIdToRemove   : null, // Keep track of the snap id to remove if the user confirms the action
+    pendingTitleToRemove: null, // Keep track of the snap title to remove if the user confirms the action
+
     // Keep track of the accessible snaps for the current user
     snaps : [],
     initialFetchFailed : false, // Keep track if the snaps have correctly been fetched from the server
@@ -182,6 +187,20 @@ export const mutations = {
      */
     setSnackbar(state, value) {
         state.snackbar = value;
+    },
+
+    // ---------------- Remove modal dialog management
+    showRemoveDialog(state) {
+        state.removeDialog = true;
+    },
+
+    hideRemoveDialog(state) {
+        state.removeDialog = false;
+    },
+
+    setRemoveDialogInfo(state, { id, title }) {
+        state.pendingIdToRemove = id;
+        state.pendingTitleToRemove = title;
     },
 
     // ---------------- Snaps management
