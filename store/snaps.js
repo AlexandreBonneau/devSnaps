@@ -55,6 +55,14 @@ export const getters = {
     },
 
     /**
+     * Calculate the number of favourited snaps
+     * @param state
+     */
+    snapFavCount(state) {
+        return getters.favSnaps(state).length;
+    },
+
+    /**
      * Return the snap of the given id
      *
      * @param state

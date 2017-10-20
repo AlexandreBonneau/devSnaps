@@ -110,7 +110,7 @@
 
         computed: {
             snapCount() {
-                return this.$store.getters.snapCount;
+                return this.$store.getters['snaps/snapCount'];
             },
 
             snackbar: {

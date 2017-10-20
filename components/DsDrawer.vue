@@ -47,7 +47,11 @@
 					<v-icon v-html="item.icon"></v-icon>
 				</v-list-tile-action>
 				<v-list-tile-content>
-					<v-list-tile-title v-text="item.title"></v-list-tile-title>
+					<v-badge color="indigo" v-if="item.to === '/favorites'">
+						<v-list-tile-title v-text="item.title"></v-list-tile-title>
+						<span slot="badge">{{ snapFavCount }}</span>
+					</v-badge>
+					<v-list-tile-title v-text="item.title" v-else></v-list-tile-title>
 				</v-list-tile-content>
 			</v-list-tile>
 		</v-list>
@@ -64,9 +68,9 @@
                 items      : [
                     { icon: 'home', title: 'Home', to: '/' },
                     { icon: 'view_quilt', title: 'All Snaps', to: '/snaps' },
-//                    { icon: 'search', title: 'Search the posts', to: '/search' },
-                    { icon: 'star', title: 'Selected posts', to: '/favorites' },
-                    { icon: 'whatshot', title: 'Hot posts', to: '/hot' },
+//                    { icon: 'search', title: 'Search the snaps', to: '/search' },
+                    { icon: 'star', title: 'Favorite snaps', to: '/favorites' },
+                    { icon: 'whatshot', title: 'Hot snaps', to: '/hot' },
                     { icon: 'assignment', title: 'My Snaps', to: `/${this.$store.state.auth.currentUser}/snaps` },
 
                     { icon: 'add_box', title: 'Create a new Snap', to: '/snap' },
@@ -81,6 +85,12 @@
                 ],
                 miniVariant: false,
             };
+        },
+
+        computed: {
+            snapFavCount() {
+                return this.$store.getters['snaps/snapFavCount'];
+            },
         },
 
         methods: {
