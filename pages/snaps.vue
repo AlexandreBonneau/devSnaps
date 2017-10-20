@@ -4,13 +4,13 @@
 			<div class="text-xs-center">
 				<p>Search the <strong>{{ snapCount }}</strong> snaps</p>
 				<v-select
-						:items="titlesAndContent"
+						:items="$store.state.titlesAndContent"
 						v-model="search"
 						label="Search snaps..."
 						autocomplete
 				></v-select>
 			</div>
-			<v-card v-for="snap in snaps"
+			<v-card v-for="snap in $store.state.snaps"
 			        :key="snap.id"
 			        class="mb-4 elevation-6"
 			>
@@ -22,7 +22,7 @@
 				>
 					<v-btn flat
 					       icon
-					       @click="toggleFavorite(snap.id)"
+					       @click="_toggleFavorite(snap.id)"
 					>
 						<v-icon
 								:color="snap.favorite?'amber darken-1':'grey'"
@@ -64,7 +64,7 @@
 					>
 						<v-btn flat
 						       icon
-						       @click="update(snap.id)"
+						       @click="_updateSnap(snap.id)"
 						       slot="activator"
 						>
 							<v-icon>mode_edit</v-icon>
@@ -127,7 +127,7 @@
 			<v-alert color="error" icon="warning" value="true">
 				Impossible to fetch the snaps from the server.<br>Please check your connection and try again later.
 			</v-alert>
-			<v-btn @click.native="getSnaps">Try to fetch the data from the server again</v-btn>
+			<v-btn @click.native="_getSnaps">Try to fetch the data from the server again</v-btn>
 			<!--//FIXME Add a button to try to fetch the data again, without having to reload the page-->
 		</v-flex>
 		<v-dialog v-model="removeDialog" lazy absolute>
@@ -169,6 +169,7 @@
     import Prism from '../node_modules/prismjs/prism';
     import moment from '../node_modules/moment/moment';
     import config from '../config/base';
+    import clone from '../node_modules/lodash/cloneDeep';
 
     /**
      * Define the Exception object
@@ -200,21 +201,14 @@
                 removeDialog        : false, // The modal is not displayed by default
                 pendingIdToRemove   : null, // Keep track of the snap id to remove if the user confirms the action
                 pendingTitleToRemove: null, // Keep track of the snap title to remove if the user confirms the action
-                snaps               : [], // Store all the existing snaps //TODO Add pagination on this page (or infinite scroll)
                 initialFetchFailed  : false,
-                titlesAndContent    : [''], // By default, the search terms are empty
                 search              : null, // The search term is empty by default
             };
         },
 
         computed: {
-            /**
-             * Calculate the number of snaps
-             *
-             * @returns {number}
-             */
             snapCount() {
-                return Object.keys(this.snaps).length;
+                return this.$store.getters.snapCount;
             },
 
             snackbar: {
@@ -270,52 +264,6 @@
             },
 
             /**
-             * Update the search terms used is the select/autocomplete component
-             */
-            updateSearchTerms() {
-                this.titlesAndContent = ['']; // By default, the search terms are empty
-                this.snaps.forEach(snap => {
-                    this.titlesAndContent.push(snap.title);
-                    this.titlesAndContent.push(snap.content);
-                });
-            },
-
-            async getSnaps() {
-                return await axios.get(`${config.api.baseUrl}/posts`)
-                    .then(response => {
-                        this.snaps = response.data;
-//                        console.log(`Snaps fetched!`); //DEBUG
-
-                        // The fetch succeeded
-                        this.initialFetchFailed = false;
-
-                        // Tell the world about it
-                        this._showSnackbar(`${this.snaps.length} snaps have been fetched successfully.`, 'success');
-
-                        // Setup the search terms
-                        this.updateSearchTerms();
-                    },
-                          error => { // Response handler (rejected)
-                              const errorMessage = `Impossible to fetch snap data. Please try again in a moment.`;
-                              console.error(errorMessage, error); //DEBUG
-
-                              // Send the event to show a flash message
-                              this._showSnackbar(errorMessage, 'error');
-
-                              this.initialFetchFailed = true;
-                          });
-            },
-
-            /**
-             * Show a snackbar with the given text
-             */
-            _showSnackbar(text, type = 'info') {
-                this.$store.commit('modifySnackbarColor', type);
-                this.$store.commit('modifySnackbarText', text);
-                this.$store.commit('showSnackbar');
-            },
-
-            /**
              * Hide the snackbar
              */
             _hideSnackbar() {
@@ -337,7 +285,7 @@
              */
             acceptRemove() {
                 this.removeDialog = false;
-                this.remove(this.pendingIdToRemove);
+                this._removeSnap(this.pendingIdToRemove);
                 this.pendingIdToRemove = null;
                 this.pendingTitleToRemove = null;
             },
@@ -352,56 +300,19 @@
             },
 
             /**
-             * Remove the snap
-             * @param {number} id
+             * Fetch all the snaps
              */
-            remove(id) {
-                // Remove the snap from the server
-                axios.delete(`${config.api.baseUrl}/posts/${id}`)
-                    .then(response => {
-                        console.log(`Snap ${id} deleted!`); //DEBUG
-
-                        // If that worked, also remove the snap from the local object `this.snaps`
-                        this.snaps = this.snaps.filter(obj => obj.id !== id);
-
-                        // And also update the search terms
-                        this.updateSearchTerms();
-
-                        // Show a confirmation for the user
-                        this._showSnackbar(`The snap ${id} has been deleted.`, 'info');
-                    },
-                          error => { // Response handler (rejected)
-                              const errorMessage = `Impossible to remove the snap with id ${id}. Please try again in a moment.`;
-                              console.error(errorMessage, error); //DEBUG
-
-                              // Send the event to show a flash message
-                              this._showSnackbar(errorMessage, 'error');
-                          });
+            _getSnaps() {
+                this.$store.dispatch('getSnaps');
             },
 
             /**
-             * Update the database with the given snap data
+             * Remove the snap of the given `id`
              *
-             * @param {object} snapData
-             * @private
+             * @param {number} id
              */
-            _updatePost(snapData) {
-                // Send the updated data
-                axios.put(`${config.api.baseUrl}/posts`, snapData)
-                    .then(response => {
-                        console.log('response.data:', response.data); //DEBUG
-
-                        // Show a confirmation for the user
-                        this._showSnackbar(`The snap ${snapData.id} "${snapData.title}" has been updated.`, 'info');
-                    },
-                          error => { // Response handler (rejected)
-                              const errorMessage = `Impossible to update the snap with id ${snapData.id}. Please try again in a moment.`;
-                              console.error(errorMessage, error); //DEBUG
-
-                             // Send the event to show a flash message
-                              this._showSnackbar(errorMessage, 'error');
-                          }
-                     );
+            _removeSnap(id) {
+                this.$store.dispatch('removeSnap', id);
             },
 
             /**
@@ -409,15 +320,8 @@
              *
              * @param {number} id
              */
-            toggleFavorite(id) {
-                // Get the snap data
-                const snapArr = this.snaps.filter(snap => snap.id === id)[0];
-
-                // Modify it
-                snapArr.favorite = !snapArr.favorite;
-
-                // Save the change in the database
-                this._updatePost(snapArr);
+            _toggleFavorite(id) {
+                this.$store.dispatch('toggleFavorite', id);
             },
 
             /**
@@ -425,15 +329,16 @@
              *
              * @param {number} id
              */
-            update(id) {
+            _updateSnap(id) {
                 // Get the snap data
-                const snapArr = this.snaps.filter(snap => snap.id === id)[0];
+                const snapArr = this.$store.state.snaps.filter(snap => snap.id === id)[0];
+                const modifiableSnap = clone(snapArr); // Cloning is needed since I cannot mutate the snap data outside of Vuex mutation methods
 
                 // Update the edit counter
-                snapArr.timesEdited++;
+                modifiableSnap.timesEdited++;
 
                 // Save the change in the database
-                this._updatePost(snapArr);
+                this.$store.dispatch('updateSnap', modifiableSnap);
             },
 
             updateSyntaxHighligthing() {
@@ -445,7 +350,8 @@
         mounted() {
             // Fetch the snap data from the server
             console.log(`Getting data from the server...`); //DEBUG
-            this.snaps = this.getSnaps();
+//            this.snaps = this.getSnaps();
+            this._getSnaps();
         },
 
         watch: {
