@@ -10,6 +10,7 @@
 			</v-content>
 		</main>
 		<ds-footer></ds-footer>
+		<utility-elements></utility-elements>
 	</v-app>
 </template>
 
@@ -17,6 +18,7 @@
     import DsToolbar from '../components/DsToolbar.vue';
     import DsDrawer from '../components/DsDrawer.vue';
     import DsFooter from '../components/DsFooter.vue';
+    import UtilityElements from '../components/UtilityElements.vue';
     import config from '../config/base';
 
     export default {
@@ -30,6 +32,7 @@
             DsToolbar,
             DsDrawer,
             DsFooter,
+            UtilityElements,
         },
 
         methods: {
