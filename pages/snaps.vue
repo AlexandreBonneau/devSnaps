@@ -40,19 +40,7 @@
 			<v-btn @click.native="_getSnaps">Try to fetch the data from the server again</v-btn>
 			<!--//FIXME Add a button to try to fetch the data again, without having to reload the page-->
 		</v-flex>
-		<v-dialog v-model="$store.state.removeDialog.removeDialog" lazy absolute>
-			<v-card>
-				<v-card-title>
-					<div class="headline">Are you sure you want to delete that snap?</div>
-				</v-card-title>
-				<v-card-text>Deleting the snap [<i>{{ $store.state.removeDialog.pendingTitleToRemove }}</i>] <strong>cannot be undone</strong>.<br><br>Use with care.</v-card-text>
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn color="blue darken-1" flat @click.native="cancelRemove">Cancel</v-btn>
-					<v-btn color="red darken-1" @click.native="acceptRemove">Delete</v-btn>
-				</v-card-actions>
-			</v-card>
-		</v-dialog>
+		<remove-dialog></remove-dialog>
 		<snackbar></snackbar>
 	</v-layout>
 </template>
@@ -60,6 +48,7 @@
 <script>
     import Snackbar from '../components/Snackbar.vue';
     import Snap from '../components/Snap.vue';
+    import RemoveDialog from '../components/RemoveDialog.vue';
 
     /**
      * Define the Exception object
@@ -79,6 +68,7 @@
         name: 'SnapList',
 
         components: {
+            RemoveDialog,
             Snackbar,
             Snap,
         },
@@ -102,38 +92,10 @@
 
         methods: {
             /**
-             * The user confirmed the removal of the snap
-             */
-            acceptRemove() {
-                this.$store.commit('removeDialog/hideRemoveDialog');
-                this._removeSnap(this.$store.state.removeDialog.pendingIdToRemove);
-                //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
-                window.setTimeout(() => this.$store.commit('removeDialog/setRemoveDialogInfo', { id: null, title: null }), 300);
-            },
-
-            /**
-             * The user cancelled the removal of the snap
-             */
-            cancelRemove() {
-                this.$store.commit('removeDialog/hideRemoveDialog');
-                //TODO Use a better mean than `setTimeout` to reset the dialog info _after_ the modal is completely hidden
-                window.setTimeout(() => this.$store.commit('removeDialog/setRemoveDialogInfo', { id: null, title: null }), 300);
-            },
-
-            /**
              * Fetch all the snaps
              */
             _getSnaps() {
                 this.$store.dispatch('snaps/getSnaps');
-            },
-
-            /**
-             * Remove the snap of the given `id`
-             *
-             * @param {number} id
-             */
-            _removeSnap(id) {
-                this.$store.dispatch('snaps/removeSnap', id);
             },
         },
 
@@ -166,10 +128,6 @@
 	.snapLink {
 		cursor          : pointer;
 		text-decoration : none;
-	}
-
-	.removeButton:hover {
-		color: #FF5252 !important;
 	}
 
 	// CSS rules for the prism.js code highlight
