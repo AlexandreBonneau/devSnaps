@@ -92,13 +92,6 @@
                 this.$store.dispatch('snaps/getSnaps');
             },
         },
-
-        mounted() {
-            // Fetch the snap data from the server
-            console.log(`Getting data from the server...`); //DEBUG
-//            this.snaps = this.getSnaps();
-            this._getSnaps();
-        },
     };
 </script>
 

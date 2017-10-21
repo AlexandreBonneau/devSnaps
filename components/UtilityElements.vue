@@ -16,6 +16,21 @@
             Snackbar,
             RemoveDialog,
         },
+
+        methods: {
+            /**
+             * Fetch all the snaps
+             */
+            _getSnaps() {
+                this.$store.dispatch('snaps/getSnaps');
+            },
+        },
+
+        mounted() {
+            // Fetch the snap data from the server
+            console.log(`Getting data from the server...`); //DEBUG
+            this._getSnaps();
+        },
     };
 </script>
 
