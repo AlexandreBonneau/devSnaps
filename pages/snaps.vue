@@ -40,15 +40,13 @@
 			<v-btn @click.native="_getSnaps">Try to fetch the data from the server again</v-btn>
 			<!--//FIXME Add a button to try to fetch the data again, without having to reload the page-->
 		</v-flex>
-		<remove-dialog></remove-dialog>
-		<snackbar></snackbar>
+		<utility-elements></utility-elements>
 	</v-layout>
 </template>
 
 <script>
-    import Snackbar from '../components/Snackbar.vue';
     import Snap from '../components/Snap.vue';
-    import RemoveDialog from '../components/RemoveDialog.vue';
+    import UtilityElements from '../components/UtilityElements.vue';
 
     /**
      * Define the Exception object
@@ -68,8 +66,7 @@
         name: 'SnapList',
 
         components: {
-            RemoveDialog,
-            Snackbar,
+            UtilityElements,
             Snap,
         },
 
