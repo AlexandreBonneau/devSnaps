@@ -2,7 +2,7 @@
 export const state = () => ({
     // Default values for the Snackbar state
     snackbar       : false,
-    snackbarY      : 'top',
+    snackbarY      : 'bottom',
     snackbarX      : 'right',
     snackbarMode   : '',
     snackbarTimeout: 6000,
