@@ -7,8 +7,6 @@
 			@input="toggleDrawer"
 			app
 	>
-			<!--@input="toggleDrawer"-->
-			<!--v-model="$store.state.navigationDrawer.showDrawer"-->
 		<v-list>
 			<v-list-tile v-if="miniVariant"
 			             @click.stop="miniVariant = !miniVariant"
@@ -21,7 +19,7 @@
 				<v-list-tile-avatar>
 					<nuxt-link to="/">
 						<svg class="logo">
-							<use xlink:href="svg-defs.svg#logo-devSnaps"></use>
+							<use xlink:href="/svg-defs.svg#logo-devSnaps"></use>
 						</svg>
 					</nuxt-link>
 				</v-list-tile-avatar>
@@ -54,42 +52,100 @@
 					<v-list-tile-title v-text="item.title" v-else></v-list-tile-title>
 				</v-list-tile-content>
 			</v-list-tile>
+			<v-divider></v-divider>
+			<template v-if="isAuthenticated">
+				<v-list-tile :to="'/favorites'" router>
+					<v-list-tile-action>
+						<v-icon v-html="'star'"></v-icon>
+					</v-list-tile-action>
+					<v-list-tile-content>
+						<v-list-tile-title v-text="'Favorite snaps'"></v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+				<v-list-tile :to="userSnapsLink" router>
+					<v-list-tile-action>
+						<v-icon v-html="'assignment'"></v-icon>
+					</v-list-tile-action>
+					<v-list-tile-content>
+						<v-list-tile-title v-text="'My Snaps'"></v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+				<v-list-tile :to="profileLink" router>
+					<v-list-tile-action>
+						<v-icon v-html="'settings'"></v-icon>
+					</v-list-tile-action>
+					<v-list-tile-content>
+						<v-list-tile-title v-text="'Settings'"></v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+				<v-list-tile :to="'/logout'" router>
+					<v-list-tile-action>
+						<v-icon v-html="'power_settings_new'"></v-icon>
+					</v-list-tile-action>
+					<v-list-tile-content>
+						<v-list-tile-title v-text="'Logout'"></v-list-tile-title>
+					</v-list-tile-content>
+				</v-list-tile>
+			</template>
+			<v-list-tile
+					v-else
+					router
+					:to="item.to"
+					:key="i"
+					v-for="(item, i) in itemsGuest"
+			>
+				<v-list-tile-action>
+					<v-icon v-html="item.icon"></v-icon>
+				</v-list-tile-action>
+				<v-list-tile-content>
+					<v-list-tile-title v-text="item.title"></v-list-tile-title>
+				</v-list-tile-content>
+			</v-list-tile>
 		</v-list>
 	</v-navigation-drawer>
 </template>
 
 <script>
+    import authMixin from '../mixins/auth';
+
     export default {
         name: 'DsDrawer',
 
+        mixins: [authMixin],
+
         data() {
             return {
-                clipped    : false,
-                items      : [
+                clipped           : false,
+                items             : [
                     { icon: 'home', title: 'Home', to: '/' },
                     { icon: 'view_quilt', title: 'All Snaps', to: '/snaps' },
-//                    { icon: 'search', title: 'Search the snaps', to: '/search' },
-                    { icon: 'star', title: 'Favorite snaps', to: '/favorites' },
                     { icon: 'whatshot', title: 'Hot snaps', to: '/hot' },
-                    { icon: 'assignment', title: 'My Snaps', to: `/${this.$store.state.auth.currentUser}/snaps` },
 
                     { icon: 'add_box', title: 'Create a new Snap', to: '/snap' },
                     { icon: 'book', title: 'Documentation', to: '/hi' },
-                    { icon: 'input', title: 'Login', to: '/login' },
-                    { icon: 'account_box', title: 'Sign up', to: '/signup' }, //FIXME Only display if a user is not logged in
 //                    { icon: 'insert_chart', title: 'Statistics', to: '/stats' },
-                    { icon: 'settings', title: 'Settings', to: `/profile/${this.$store.state.auth.currentUser}` },
-//                    { icon: 'file_download', title: 'Export all your snaps', to: `/${this.$store.state.auth.currentUser}/export` }, //FIXME Only display if a user is logged in //FIXME Display that only in the settings page
-                    { icon: 'power_settings_new', title: 'Logout', to: '/logout' }, //FIXME Only display if a user is logged in
                     { icon: 'delete_forever', title: 'Testing a single snap', to: '/acid/snap/5/the-slug-to-use' }, //FIXME Delete this (only used for tests)
                 ],
-                miniVariant: false,
+                miniVariant       : false,
+                // Only display if a user is not logged in
+                itemsGuest        : [
+                    { icon: 'input', title: 'Login', to: '/login' },
+                    { icon: 'account_box', title: 'Sign up', to: '/signup' },
+                ],
             };
         },
 
         computed: {
             snapFavCount() {
                 return this.$store.getters['snaps/snapFavCount'];
+            },
+
+            profileLink() {
+                return `/profile/${this.$store.getters['auth/getUsername']}`;
+            },
+
+            userSnapsLink() {
+                return `/${this.$store.getters['auth/getUsername']}/snaps`;
             },
         },
 

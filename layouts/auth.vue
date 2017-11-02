@@ -4,7 +4,7 @@
 		<ds-toolbar :title="title"></ds-toolbar>
 		<main>
 			<v-content>
-				<v-container>
+				<v-container fill-height>
 					<nuxt/>
 				</v-container>
 			</v-content>
