@@ -1,5 +1,17 @@
 <template>
 	<div>
-		<p>This is added only to make sure a {idSnap} is passed to /{user}/snap/{idSnap}</p>
+		<p>The provided snap id is not correct.</p>
+		<p>Redirecting to this user snaps page.</p>
 	</div>
 </template>
+
+<script>
+    export default {
+        beforeCreate() {
+            // Hack to redirect to the user snaps page, when no snapId is given
+            setTimeout(() => {
+                this.$router.replace(`/${this.$router.currentRoute.params.user}/snaps`);
+            }, 1500);
+        },
+    };
+</script>

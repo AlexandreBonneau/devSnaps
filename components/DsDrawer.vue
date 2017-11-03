@@ -124,7 +124,6 @@
                     { icon: 'add_box', title: 'Create a new Snap', to: '/snap' },
                     { icon: 'book', title: 'Documentation', to: '/hi' },
 //                    { icon: 'insert_chart', title: 'Statistics', to: '/stats' },
-                    { icon: 'delete_forever', title: 'Testing a single snap', to: '/acid/snap/5/the-slug-to-use' }, //FIXME Delete this (only used for tests)
                 ],
                 miniVariant       : false,
                 // Only display if a user is not logged in
