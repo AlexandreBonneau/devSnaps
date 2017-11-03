@@ -1,4 +1,4 @@
-import axios from '../node_modules/axios/dist/axios.min';
+import axios from 'axios';
 import config from '../config/base';
 import clone from '../node_modules/lodash/cloneDeep';
 

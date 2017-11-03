@@ -99,7 +99,7 @@
 </template>
 
 <script>
-    import axios from '../node_modules/axios/dist/axios.min';
+    import axios from 'axios';
     import VueMarkdown from '../node_modules/vue-markdown/src/VueMarkdown';
     import Prism from '../node_modules/prismjs/prism';
     import moment from '../node_modules/moment/moment';

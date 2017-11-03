@@ -1,7 +1,3 @@
-import axios from '../node_modules/axios/dist/axios.min';
-import config from '../config/base';
-import clone from '../node_modules/lodash/cloneDeep';
-
 // The 'classic' way
 /*
 import Vuex from '../node_modules/vuex/dist/vuex.min';

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-    import axios from '../node_modules/axios/dist/axios.min';
+    import axios from 'axios';
     import config from '../config/base';
     import authMixin from '../mixins/auth';
 

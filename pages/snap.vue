@@ -76,7 +76,7 @@
 </template>
 
 <script>
-    import axios from '../node_modules/axios/dist/axios.min';
+    import axios from 'axios';
 
     export default {
         name: 'AddSnapPage',
