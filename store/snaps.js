@@ -93,7 +93,7 @@ export const mutations = {
      * @param {object} state
      * @param {object} payload
      */
-    setSnap(state, payload) { //FIXME Test this
+    setSnap(state, payload) {
         const id = payload.id;
         const snapData = payload.snapData;
 
@@ -109,22 +109,39 @@ export const mutations = {
     },
 
     /**
+     * Add the given Snap info to the snap store
+     *
+     * @param {object} state
+     * @param {object} snapData
+     */
+    addSnapToStore(state, snapData) {
+        // Check that the given new snap doesn't already exist
+        const snapArrayIndex = state.snaps.findIndex(obj => obj.id === snapData.id);
+        if (snapArrayIndex !== -1) {
+            // An index is found
+            throw new Error(`Impossible to add a new Snap. One with the same id ${snapData.id} already exists.`);
+        }
+
+        // Update the data
+        state.snaps.unshift(snapData); // cf. https://vuejs.org/v2/guide/list.html#Caveats
+    },
+
+    /**
      * Update the snap with the given id, with the given selected data
      *
      * @param {object} state
      * @param {object} payload
      */
-    updateSnap(state, payload) {
-        const id = payload.id;
+    updateSnapStore(state, payload) {
         const snapData = payload.snapData;
 
-        // Find the snap
-        const snapArray = state.snaps.find(obj => obj.id === id);
+        // Find the snap in the Vuex store
+        const snapArray = state.snaps.find(obj => obj.id === snapData.id);
         if (snapArray === void(0)) {
-            throw new Error(`Impossible to find the Snap with index ${id}`);
+            throw new Error(`Impossible to find the Snap with index ${snapData.id}`);
         }
 
-        // Update the data
+        // Update the Vuex data
         for (const prop in snapData) {
             if (snapData.hasOwnProperty(prop)) {
                 snapArray[prop] = snapData[prop];
@@ -153,6 +170,13 @@ export const mutations = {
  * Actions are needed when manipulating asynchronous data
  */
 export const actions = {
+    /**
+     * Retrieve all the Snaps from the server
+     *
+     * @param {object} commit
+     * @param {object} state
+     * @returns {Promise.<TResult>}
+     */
     async getSnaps({ commit, state }) {
         return await axios.get(`${config.api.baseUrl}/posts`)
             .then(response => {
@@ -182,8 +206,9 @@ export const actions = {
 
     /**
      * Remove the snap
-     * @param commit
-     * @param state
+     *
+     * @param {object} commit
+     * @param {object} state
      * @param {number} id
      */
     removeSnap({ commit, state }, id) {
@@ -211,24 +236,79 @@ export const actions = {
     },
 
     /**
+     * Add the given new Snap to the server database and update the Vuex store accordingly
+     *
+     * @param {object} commit
+     * @param {object} snapData
+     * @param {object} router
+     */
+    addSnap({ commit }, { snapData, router }) {
+        //FIXME The user_id is not saved in the database
+        //FIXME Only accept a new Snap if the username/API token is correct, or if the username is `null` (then the Anonymous user is used)
+        axios.post(`${config.api.baseUrl}/posts`)
+            .then(response => {
+                if (response.data.error) {
+                    commit('snackbar/_showSnackbar', { text: response.data.errorMessage, type: 'error' }, { root: true });
+                } else {
+                    // Update the Vuex store with the new Snap
+                    commit('addSnapToStore', snapData);
+
+                    // And also update the search terms
+                    commit('updateSearchTerms');
+
+                    // Show a confirmation for the user
+                    commit('snackbar/_showSnackbar', { text: `Snap '${snapData.title}' created.`, type: 'info' }, { root: true });
+
+                    // Then redirect to the all snaps page
+                    //TODO Redirect to the /user/snaps page instead?
+                    router.replace({ path: '/snaps' });
+                }
+            },
+                  error => { // Response handler (rejected)
+                      const errorMessage = `Impossible to create a new Snap due to a server problem. Please try again in a moment.`;
+                      console.error(errorMessage, error); //DEBUG
+
+                      // Send the event to show a flash message
+                      commit('snackbar/_showSnackbar', { text: errorMessage, type: 'error' }, { root: true });
+                  });
+    },
+
+    /**
      * Update the database with the given snap data.
      * The snap data can be partial ; only the given data will be updated.
      * The already existing snap data in the target won't be touched if it's not present in the source.
      *
      * @param commit
+     * @param {object} rootGetters
      * @param {object} snapData
      * @private
      */
-    updateSnap({ commit }, snapData) {
+    updateSnap({ commit, rootGetters }, snapData) {
+        // Update the edit counter
+        snapData.timesEdited++; //FIXME This is not taken into account
+
+        // Add the auth info so that the server will be able to validate the request
+        const dataToSend = {
+            snapData,
+            //FIXME Use a middleware here instead of manually passing the auth data in each query
+            // Add the API token and the user id to that request
+            username: rootGetters['auth/getUsername'],
+            apiToken: rootGetters['auth/getAPIToken'],
+        };
+
         // Send the updated data
-        axios.put(`${config.api.baseUrl}/posts`, snapData)
+        axios.put(`${config.api.baseUrl}/posts`, dataToSend)
             .then(response => {
                 // console.log('response.data:', response.data); //DEBUG
-                // Since the back-end accepted the modification, commit the change to the Vuex store state
-                commit('updateSnap', { id: snapData.id, snapData }); // Call the mutation
+                if (response.data.error) {
+                    commit('snackbar/_showSnackbar', { text: response.data.errorMessage, type: 'error' }, { root: true });
+                } else {
+                    // Since the back-end accepted the modification, commit the change to the Vuex store state
+                    commit('updateSnapStore', { snapData }); // Call the mutation
 
-                // Show a confirmation for the user
-                commit('snackbar/_showSnackbar', { text: `The snap ${snapData.id} "${snapData.title}" has been updated.`, type: 'info' }, { root: true });
+                    // Show a confirmation for the user
+                    commit('snackbar/_showSnackbar', { text: `The snap ${snapData.id} "${snapData.title}" has been updated.`, type: 'info' }, { root: true });
+                }
             },
                   error => { // Response handler (rejected)
                       const errorMessage = `Impossible to update the snap "${snapData.title}" [${snapData.id}]. Please try again in a moment.`;
@@ -243,8 +323,8 @@ export const actions = {
     /**
      * Toggle the state of the `favorite` data, then transmit that change to the database
      *
-     * @param state
-     * @param dispatch
+     * @param {object} state
+     * @param {object} dispatch
      * @param {number} id
      */
     toggleFavorite({ state, dispatch }, id) {

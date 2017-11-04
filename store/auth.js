@@ -90,6 +90,7 @@ function checkAndUpdateLoggedUser(response, commit, payload, successText, redire
 
         // Show a confirmation for the user
         commit('snackbar/_showSnackbar', { text: successText, type: 'success' }, { root: true });
+
         // Redirect to the user dashboard
         payload.router.push(redirectUrl);
 

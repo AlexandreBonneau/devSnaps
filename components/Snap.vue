@@ -1,109 +1,153 @@
 <template>
 	<v-card class="mb-4 elevation-6">
-		<v-card-title class="headline"
-		              ref="title"
-		>
-			<v-btn flat
-			       icon
-			       @click="_toggleFavorite(id)"
-			>
-				<v-icon
-						:color="favorite?'amber darken-1':'grey'"
-				>star</v-icon>
-			</v-btn>
-			<nuxt-link :to="`/${author}/snap/${id}/${slug}`"
-			           class="snapLink"
-			>{{ title }}
-			</nuxt-link>
-		</v-card-title>
-		<v-card-text>
-			<vue-markdown ref="content"
-			              :source="content"
-			></vue-markdown>
-			<v-container fluid grid-list-sm>
-				<!--//TODO Modify those data so it looks better-->
-				<v-layout row justify-space-between>
-					<v-flex>
-						<small>Times viewed: {{ timesViewed }}</small>
-					</v-flex>
-					<v-flex>
-						<small>Times edited: {{ timesEdited }}</small>
-					</v-flex>
-					<v-flex>
-						<small>{{ createdSince() }}</small>
-					</v-flex>
-					<v-flex>
-						<small>{{ updatedSince() }}</small>
-					</v-flex>
-					<v-flex>
-						<small>Author: <nuxt-link :to="authorLink">{{ author }}</nuxt-link></small>
-					</v-flex>
-				</v-layout>
-			</v-container>
-		</v-card-text>
-		<v-card-actions>
-			<v-spacer></v-spacer>
-			<v-tooltip bottom
-			           open-delay="450"
-			>
-				<v-btn flat
-				       icon
-				       @click="_updateSnap(id)"
-				       slot="activator"
-				>
+		<v-tabs dark fixed icons centered v-if="editMode">
+			<v-tabs-bar>
+				<v-tabs-slider></v-tabs-slider>
+				<v-tabs-item href="#tab-1">
 					<v-icon>mode_edit</v-icon>
-				</v-btn>
-				<span>Edit the snap</span>
-			</v-tooltip>
-			<v-tooltip bottom
-			           open-delay="450"
+					Write
+				</v-tabs-item>
+				<v-tabs-item href="#tab-2">
+					<v-icon>insert_photo</v-icon>
+					Preview
+				</v-tabs-item>
+			</v-tabs-bar>
+			<v-tabs-items>
+				<v-tabs-content id="tab-1">
+					<snap-edit class="pa-3"
+							actionSubmit="Update Snap"
+							actionSubmitTitle="Update the Snap content"
+							actionCancelTitle="Cancel the Snap edition"
+							:title="title"
+							:slug="slug"
+							:favorite="favorite"
+							:content="content"
+							:id="id"
+							@snapSubmitted="_updateSnap"
+							@snapCancelled="cancelSnapEdition"
+							icon="check"
+					></snap-edit>
+				</v-tabs-content>
+				<v-tabs-content id="tab-2">
+					<v-card flat>
+						<!--//FIXME Modifying the data in the `snap-edit` does not update the preview since SnapEdit modify its own `titleToUse` data-->
+						<v-card-title class="headline">{{ title }}</v-card-title>
+						<v-card-text>
+							<vue-markdown ref="content"
+							              :source="content"
+							></vue-markdown>
+						</v-card-text>
+					</v-card>
+				</v-tabs-content>
+			</v-tabs-items>
+		</v-tabs>
+		<template v-else>
+			<v-card-title class="headline"
+			              ref="title"
 			>
 				<v-btn flat
 				       icon
-				       @click="displayRemoveModal(id, title)"
-				       slot="activator"
-				       class="removeButton"
+				       @click="_toggleFavorite(id)"
 				>
-					<v-icon>delete</v-icon>
+					<v-icon
+							:color="favorite?'amber darken-1':'grey'"
+					>star</v-icon>
 				</v-btn>
-				<span>Delete the snap</span>
-			</v-tooltip>
-			<v-tooltip bottom
-			           open-delay="450"
-			>
-				<v-btn flat
-				       icon
-				       :href="urlShare(id, slug)"
-				       slot="activator"
+				<nuxt-link :to="`/${author}/snap/${id}/${slug}`"
+				           class="snapLink"
+				>{{ title }}
+				</nuxt-link>
+			</v-card-title>
+			<v-card-text>
+				<vue-markdown ref="content"
+				              :source="content"
+				></vue-markdown>
+				<v-container fluid grid-list-sm>
+					<!--//TODO Modify those data so it looks better-->
+					<v-layout row justify-space-between>
+						<v-flex>
+							<small>Times viewed: {{ timesViewed }}</small>
+						</v-flex>
+						<v-flex>
+							<small>Times edited: {{ timesEdited }}</small>
+						</v-flex>
+						<v-flex>
+							<small>{{ createdSince() }}</small>
+						</v-flex>
+						<v-flex>
+							<small>{{ updatedSince() }}</small>
+						</v-flex>
+						<v-flex>
+							<small>Author: <nuxt-link :to="authorLink">{{ author }}</nuxt-link></small>
+						</v-flex>
+					</v-layout>
+				</v-container>
+			</v-card-text>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-tooltip bottom
+				           open-delay="450"
 				>
-					<v-icon>share</v-icon>
-				</v-btn>
-				<span>Share</span>
-			</v-tooltip>
-			<v-tooltip bottom
-			           open-delay="450"
-			>
-				<v-btn flat
-				       icon
-				       color="primary"
-				       :href="urlSearch(title)"
-				       target="_blank"
-				       slot="activator"
+					<v-btn flat
+					       icon
+					       @click="editMode = true"
+					       slot="activator"
+					>
+						<!--//FIXME Do not display that button if the snap does not belong to the current user-->
+						<v-icon>mode_edit</v-icon>
+					</v-btn>
+					<span>Edit the snap</span>
+				</v-tooltip>
+				<v-tooltip bottom
+				           open-delay="450"
 				>
-					<v-icon>public</v-icon>
-				</v-btn>
-				<span>Query the web with that question</span>
-			</v-tooltip>
-		</v-card-actions>
+					<v-btn flat
+					       icon
+					       @click="displayRemoveModal(id, title)"
+					       slot="activator"
+					       class="removeButton"
+					>
+						<v-icon>delete</v-icon>
+					</v-btn>
+					<span>Delete the snap</span>
+				</v-tooltip>
+				<v-tooltip bottom
+				           open-delay="450"
+				>
+					<v-btn flat
+					       icon
+					       :href="urlShare(id, slug)"
+					       slot="activator"
+					>
+						<v-icon>share</v-icon>
+					</v-btn>
+					<span>Share</span>
+				</v-tooltip>
+				<v-tooltip bottom
+				           open-delay="450"
+				>
+					<v-btn flat
+					       icon
+					       color="primary"
+					       :href="urlSearch(title)"
+					       target="_blank"
+					       slot="activator"
+					>
+						<v-icon>public</v-icon>
+					</v-btn>
+					<span>Query the web with that question</span>
+				</v-tooltip>
+			</v-card-actions>
+		</template>
 	</v-card>
 </template>
 
 <script>
     import axios from 'axios';
     import VueMarkdown from '../node_modules/vue-markdown/src/VueMarkdown';
+    import SnapEdit from '~/components/SnapEdit.vue';
     import Prism from '../node_modules/prismjs/prism';
     import moment from '../node_modules/moment/moment';
-    import config from '../config/base';
     import clone from '../node_modules/lodash/cloneDeep';
 
     export default {
@@ -111,6 +155,7 @@
 
         components: {
             VueMarkdown,
+            SnapEdit,
         },
 
         props: [
@@ -128,7 +173,7 @@
 
         data() {
             return {
-                //
+                editMode: false, // By default, the edit form is hidden
             };
         },
 
@@ -203,20 +248,21 @@
             },
 
             /**
-             * Select the snap with the given id, and update the database with its data
+             * Update the snap with the given data and update the store and the database with its data
              *
-             * @param {number} id
+             * @param {object} snapData
              */
-            _updateSnap(id) {
-                // Get the snap data
-                const snapArr = this.$store.state.snaps.snaps.filter(snap => snap.id === id)[0];
-                const modifiableSnap = clone(snapArr); // Cloning is needed since I cannot mutate the snap data outside of Vuex mutation methods
-
-                // Update the edit counter
-                modifiableSnap.timesEdited++;
-
+            _updateSnap(snapData) {
                 // Save the change in the database
-                this.$store.dispatch('snaps/updateSnap', modifiableSnap);
+                this.$store.dispatch('snaps/updateSnap', snapData);
+                //TODO If the update is successful, set the `editMode` to `false`
+            },
+
+            /**
+             * Cancel the current Snap edition
+             */
+            cancelSnapEdition() {
+                this.editMode = false;
             },
         },
     };
