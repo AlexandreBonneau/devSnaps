@@ -6,6 +6,12 @@ export const state = () => ({
 });
 
 export const getters = {
+    /**
+     * Return `true` if a user is currently logged on
+     *
+     * @param {object} state
+     * @returns {boolean}
+     */
     isAuthenticated(state) {
         // console.log(`store/auth.js isAuthenticated() called`, state.currentUser); //DEBUG
         return state.currentUser !== null &&
@@ -13,12 +19,32 @@ export const getters = {
             state.currentUser.api_token !== '';
     },
 
+    /**
+     * Return the username of the current user
+     *
+     * @param {object} state
+     * @returns {string}
+     */
     getUsername(state) {
         if (state.currentUser !== null) {
             return state.currentUser.username;
         }
 
         return '';
+    },
+
+    /**
+     * Return the current API token used by the current user
+     *
+     * @param {object} state
+     * @returns {string|null}
+     */
+    getAPIToken(state) {
+        if (state.currentUser !== null) {
+            return state.currentUser.api_token;
+        }
+
+        return null;
     },
 };
 
