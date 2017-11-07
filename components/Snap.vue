@@ -65,21 +65,35 @@
 				<v-container fluid grid-list-sm>
 					<!--//TODO Modify those data so it looks better-->
 					<v-layout row justify-space-between>
-						<v-flex>
-							<small>Times viewed: {{ timesViewed }}</small>
-						</v-flex>
-						<v-flex>
-							<small>Times edited: {{ timesEdited }}</small>
-						</v-flex>
-						<v-flex>
-							<small>{{ createdSince() }}</small>
-						</v-flex>
-						<v-flex>
-							<small>{{ updatedSince() }}</small>
-						</v-flex>
-						<v-flex>
-							<small>Author: <nuxt-link :to="authorLink">{{ author }}</nuxt-link></small>
-						</v-flex>
+						<v-chip color="grey darken-2" text-color="white" small dark>
+							<v-avatar class="grey darken-1">{{ timesViewed }}</v-avatar>
+							Times viewed
+						</v-chip>
+						<v-chip color="grey darken-2" text-color="white" small dark>
+							<v-avatar class="grey darken-1">{{ timesEdited }}</v-avatar>
+							Times edited
+						</v-chip>
+						<v-chip color="grey darken-3" text-color="white" small dark>
+							{{ createdSince() }}
+						</v-chip>
+						<v-chip color="grey darken-3" text-color="white" small dark>
+							{{ updatedSince() }}
+						</v-chip>
+						<v-chip color="grey darken-4" small>
+							<nuxt-link :to="authorLink" class="noDecoration">
+								<v-avatar>
+									<svg class="avatarAnon" v-if="author === 'Anonymous'">
+										<use xlink:href="/svg-defs.svg#anonMask"></use>
+									</svg>
+									<!--//FIXME Get the avatar from the server-->
+									<img src="https://randomuser.me/api/portraits/men/35.jpg" v-else :alt="author">
+								</v-avatar>
+								{{ author }}
+							</nuxt-link>
+						</v-chip>
+						<!--<v-flex>-->
+							<!--<small>Author: <nuxt-link :to="authorLink">{{ author }}</nuxt-link></small>-->
+						<!--</v-flex>-->
 					</v-layout>
 				</v-container>
 			</v-card-text>
@@ -272,6 +286,16 @@
 	.snapLink {
 		cursor          : pointer;
 		text-decoration : none;
+	}
+
+	.noDecoration {
+		text-decoration : none;
+		color : whitesmoke !important;
+	}
+
+	.avatarAnon {
+		color : whitesmoke;
+		width : 20px;
 	}
 
 	code {

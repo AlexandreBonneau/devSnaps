@@ -34,6 +34,20 @@ export const getters = {
     },
 
     /**
+     * Return the email of the current user
+     *
+     * @param {object} state
+     * @returns {string}
+     */
+    getEmail(state) {
+        if (state.currentUser !== null) {
+            return state.currentUser.email;
+        }
+
+        return '';
+    },
+
+    /**
      * Return the current API token used by the current user
      *
      * @param {object} state
