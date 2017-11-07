@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "Everyday solutions to everyday dev problems",
   "author": "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
-  "license": "MIT"
+  "license": "MIT",
   "scripts": {
     "dev": "cross-env HOST=devsnaps PORT=3000 nuxt",
     "front": "yarn dev",
