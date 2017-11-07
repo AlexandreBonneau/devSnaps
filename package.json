@@ -1,6 +1,6 @@
 {
   "name": "devsnaps",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Everyday solutions to everyday dev problems",
   "author": "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
   "private": true,
@@ -14,12 +14,13 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "dotenv": "^4.0.0",
     "lodash": "^4.17.4",
     "moment": "^2.19.1",
     "nuxt": "^1.0.0-rc11",
     "prismjs": "^1.8.1",
     "vue-markdown": "^2.2.4",
-    "vuetify": "^0.16.1"
+    "vuetify": "^0.16.9"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

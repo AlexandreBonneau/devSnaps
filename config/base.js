@@ -1,7 +1,9 @@
+/* global process */
+
 export default {
-    title         : 'Dev Snaps',
+    title         : 'DevSnaps',
     defaultPageUrl: '/',
     api           : {
-        baseUrl: 'http://devsnaps:4242',
+        baseUrl: process.env.baseUrl,
     },
 };

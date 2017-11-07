@@ -1,3 +1,6 @@
+// Import the environment variables
+require('dotenv').config();
+
 module.exports = {
     /*
     ** Headers of the page
@@ -44,5 +47,11 @@ module.exports = {
                 });
             }
         },
+    },
+    env: {
+        protocol: process.env.BACKEND_HTTP_HTTPS || 'http',
+        host    : process.env.BACKEND_HOST || 'devsnaps',
+        port    : process.env.BACKEND_PORT || '4242',
+        baseUrl : `${process.env.BACKEND_HTTP_HTTPS}://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`,
     },
 };
