@@ -50,7 +50,7 @@ module.exports = {
     },
     env: {
         protocol: process.env.BACKEND_HTTP_HTTPS || 'http',
-        host    : process.env.BACKEND_HOST || 'devsnaps',
+        host    : process.env.BACKEND_HOST || 'localhost',
         port    : process.env.BACKEND_PORT || '4242',
         baseUrl : `${process.env.BACKEND_HTTP_HTTPS}://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`,
     },

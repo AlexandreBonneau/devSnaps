@@ -5,12 +5,12 @@
   "author": "Alexandre Bonneau <alexandre.bonneau@linuxfr.eu>",
   "license": "MIT",
   "scripts": {
-    "dev": "cross-env HOST=devsnaps PORT=3000 nuxt",
+    "dev": "cross-env HOST=localhost PORT=3000 nuxt",
     "front": "yarn dev",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "back": "php -S devsnaps:4242 -t ../back-end/public"
+    "back": "php -S localhost:4242 -t ../back-end/public"
   },
   "dependencies": {
     "axios": "^0.16.2",
