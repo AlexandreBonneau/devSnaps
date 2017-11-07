@@ -14,7 +14,7 @@ The DevSnaps application is composed of two parts:
 - The [front-end](https://github.com/AlexandreBonneau/devSnaps) with [Vue.js](https://github.com/vuejs/vue), [Nuxt.js](https://github.com/nuxt/nuxt.js) and [Vuetify.js](https://vuetifyjs.com/), and
 - The [back-end](https://github.com/AlexandreBonneau/devSnaps-back) with Laravel's lightweight [Lumen framework](https://github.com/laravel/lumen).
 
-This repository *DevSnaps* is the the code for the front-end. 
+**This repository *DevSnaps* is the code for the front-end.**
 
 ## Goal of this project
 
