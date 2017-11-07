@@ -70,6 +70,7 @@ yarn # or `npm install`
 yarn back
 ```
 *Note: for the `yarn back` command to work, this project should be put in `~/devsnaps/front-end`, while the back should be in `~/devsnaps/back-end`*
+
 4. Launch the front-end server
 ```bash
 yarn front
