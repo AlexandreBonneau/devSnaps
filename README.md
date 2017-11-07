@@ -25,6 +25,7 @@ This project has been created to serve as a playground for Nuxt and Vuetify (and
 ## Work in progress
 
 Since this is a work in progress, the features for now are pretty bare but the roadmap for the near future includes adding the following ones:
+- [ ] Setup a demo
 - [ ] Allows the users to login with their email or their username
 - [ ] Add the 'Hot snaps' page showing the latest public snaps with the most views recently
 - [ ] Add the home page with the global data about snaps, hand picked one, etc.
@@ -48,6 +49,7 @@ Since this is a work in progress, the features for now are pretty bare but the r
 - [ ] Validate the user email with a confirmation link
 - [ ] Add OAuth for sign-ups
 - [ ] Use an Auth middleware
+- [ ] Add the ability for authenticated user to comment any non-private snaps
 - [ ] Add an homepage with the favorite / most viewed snaps and other info
 - [ ] Fix the favorite system so that each user can favorite whatever snap the want
 - [ ] Add a 'project' feature so that multiple snap could be aggregated for a given project
