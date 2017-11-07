@@ -245,7 +245,7 @@ export const actions = {
     addSnap({ commit }, { snapData, router }) {
         //FIXME The user_id is not saved in the database
         //FIXME Only accept a new Snap if the username/API token is correct, or if the username is `null` (then the Anonymous user is used)
-        axios.post(`${config.api.baseUrl}/posts`)
+        axios.post(`${config.api.baseUrl}/posts`, snapData)
             .then(response => {
                 if (response.data.error) {
                     commit('snackbar/_showSnackbar', { text: response.data.errorMessage, type: 'error' }, { root: true });
