@@ -25,6 +25,7 @@ This project has been created to serve as a playground for Nuxt and Vuetify (and
 ## Work in progress
 
 Since this is a work in progress, the features for now are pretty bare but the roadmap for the near future includes adding the following ones:
+- [ ] Allows the users to login with their email or their username
 - [ ] Add the 'Hot snaps' page showing the latest public snaps with the most views recently
 - [ ] Add the home page with the global data about snaps, hand picked one, etc.
 - [ ] Add the documentation page
@@ -44,6 +45,7 @@ Since this is a work in progress, the features for now are pretty bare but the r
 - [ ] Fix the scrim bug when clicking outside of the remove dialog
 - [ ] Modify how snaps are retrieved from the server; Cache those and limit the number of queries to the server
 - [ ] Add a re-captcha in the sign-up process
+- [ ] Validate the user email with a confirmation link
 - [ ] Add OAuth for sign-ups
 - [ ] Use an Auth middleware
 - [ ] Add an homepage with the favorite / most viewed snaps and other info
