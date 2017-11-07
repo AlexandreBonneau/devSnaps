@@ -338,4 +338,31 @@ export const actions = {
         // Save the change in the database
         dispatch('updateSnap', modifiableSnap);
     },
+
+    incrementSnapViews({ state, commit, rootGetters, dispatch }, snapId) {
+        // It is always allowed to update this counter even if the user is not recognized
+        axios.patch(`${config.api.baseUrl}/posts/${snapId}/views`, { snapId })
+            .then(response => {
+                if (response.data.error) {
+                    const errorMessage = `Error while trying to update the snap view count.`;
+                    // Send the event to show a flash message
+                    commit('snackbar/_showSnackbar', { text: errorMessage, type: 'error' }, { root: true });
+                } else {
+                    // Update the store data accordingly
+                    // Get the snap data
+                    const filteredArray = state.snaps.filter(snap => snap.id === snapId);
+                    const modifiableSnap = clone(filteredArray[0]); // Here I clone the filtered array since all mutations must happen in a `mutation` method
+
+                    // Modify it
+                    modifiableSnap.timesViewed++;
+
+                    // Since the back-end accepted the modification, commit the change to the Vuex store state
+                    commit('updateSnapStore', { snapData: modifiableSnap }); // Call the mutation //FIXME The store is not updated reactively (due to direct assignation `snapArray[prop] = snapData[prop]` in `updateSnapStore()`?)
+                }
+            }, error => {
+                const errorMessage = `Impossible to update the snap view count due to a server problem. Please try again in a moment.`;
+                // Send the event to show a flash message
+                commit('snackbar/_showSnackbar', { text: errorMessage, type: 'error' }, { root: true });
+            });
+    },
 };

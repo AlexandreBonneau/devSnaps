@@ -30,7 +30,7 @@
         components: {
             Snap,
         },
-        //FIXME Only show that page if the user is allowed with the correct api token?
+        //TODO Only show that page if the user is allowed with the correct api token when the post if marked as 'private'
 
         data() {
             return {
@@ -63,6 +63,11 @@
 
                           this.initialFetchFailed = true;
                       });
+        },
+
+        mounted() {
+            // Increment the view counter each time the snap is showed on this page
+            this.$store.dispatch('snaps/incrementSnapViews', this.snap.id);
         },
 
         computed: {
